@@ -2,6 +2,9 @@
 
 # i3 workspace automation script
 
+# Move the terminal (from which this script is executed) to Workspace 6
+i3-msg "move container to workspace 6"
+
 # Function to clear out specific windows in a workspace based on class or title (avoiding terminal windows)
 clear_workspace() {
   workspace=$1
@@ -21,18 +24,18 @@ clear_workspace 4
 clear_workspace 5
 
 # Small delay to ensure processes are killed
-sleep 2
+sleep 1
 
 # Workspace 1 - Firefox (Main Browser)
-i3-msg "workspace 1; exec firefox"
-sleep 2 # Adjusted for slower startup
+i3-msg "workspace 1; exec firefox --new-window https://localhost:8000"
+sleep 1 # Give Firefox time to start
 
 # Workspace 2 - VSCode and Firefox (ChatGPT) with horizontal split
 i3-msg "workspace 2; exec code"
-sleep 3 # Giving more time for VSCode to open
+sleep 1 # Giving more time for VSCode to open
 i3-msg "split h"
 i3-msg "exec firefox --new-window https://chat.openai.com"
-sleep 3 # Adjusted for Firefox opening
+sleep 1 # Adjusted for Firefox opening
 
 # Ensure VSCode and Firefox are in the correct workspace and layout
 i3-msg "[class=\"Code\"] focus"
@@ -49,17 +52,25 @@ i3-msg "resize set 40 ppt 100 ppt"
 
 # Workspace 3 - Notion
 i3-msg "workspace 3; exec firefox --new-window https://www.notion.so/"
-sleep 2
+sleep 1 # Give Firefox time to start
 
-# Workspace 4 - Spotify
-i3-msg "workspace 4; exec spotify"
-sleep 2
+# Workspace 4 - Spotify (Flatpak)
+i3-msg "workspace 4; exec flatpak run com.spotify.Client"
+sleep 1 # Give Spotify time to start
 
-# Workspace 5 - Telegram
-i3-msg "workspace 5; exec telegram-desktop"
-sleep 2
+# Workspace 5 - Telegram (Flatpak)
+i3-msg "workspace 5; exec flatpak run org.telegram.desktop"
+sleep 1 # Give Telegram time to start
 
 # Return to Workspace 2 (Coding workspace)
 i3-msg "workspace 2"
 
 echo "Workspace setup complete."
+
+# Add a small delay before killing the terminal to allow the user to see the completion message
+# Get the terminal window ID and close it gracefully
+TERMINAL_WINDOW_ID=$(xdotool search --class "$(basename $SHELL)")
+if [ -n "$TERMINAL_WINDOW_ID" ]; then
+  xdotool windowfocus "$TERMINAL_WINDOW_ID"
+  xdotool key --clearmodifiers Alt+F4  # Send the close command to the terminal
+fi
