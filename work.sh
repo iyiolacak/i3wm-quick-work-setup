@@ -1,61 +1,65 @@
 #!/bin/bash
 
 # i3 workspace automation script
-# this script clears specified workspaces and sets up a pre-defined workspace layout with specific apps.
-# customizable to your needs. use it as a template for your workspace management.
 
-# function to clear out windows in a workspace
+# Function to clear out specific windows in a workspace based on class or title (avoiding terminal windows)
 clear_workspace() {
   workspace=$1
-  i3-msg "workspace $workspace; focus; [con_id=__focused__] kill"
+  # Kill only specific windows, avoiding accidental terminal window closure
+  i3-msg "workspace $workspace; focus"
+  i3-msg "[class=\"firefox\"] kill"
+  i3-msg "[class=\"Code\"] kill"
+  i3-msg "[class=\"spotify\"] kill"
+  i3-msg "[class=\"telegram-desktop\"] kill"
 }
 
-# delay to ensure that all windows are fully closed before continuing
-sleep 1
-
-# clear windows in the specified workspaces
+# Ensure all workspaces are clear of unnecessary windows
 clear_workspace 1
 clear_workspace 2
 clear_workspace 3
 clear_workspace 4
 clear_workspace 5
 
-# small delay to ensure the clearing is completed
-sleep 1
+# Small delay to ensure processes are killed
+sleep 2
 
-# launch firefox in workspace 1 (main browser workspace)
+# Workspace 1 - Firefox (Main Browser)
 i3-msg "workspace 1; exec firefox"
+sleep 2 # Adjusted for slower startup
 
-# setup vscode and firefox (chatGPT) in workspace 2 with a horizontal split
+# Workspace 2 - VSCode and Firefox (ChatGPT) with horizontal split
 i3-msg "workspace 2; exec code"
-sleep 2 # give vscode time to open
-i3-msg "split h" # split horizontally
+sleep 3 # Giving more time for VSCode to open
+i3-msg "split h"
 i3-msg "exec firefox --new-window https://chat.openai.com"
-sleep 2 # give firefox time to open
+sleep 3 # Adjusted for Firefox opening
 
-# ensure vscode and firefox are in the correct layout and resize them
+# Ensure VSCode and Firefox are in the correct workspace and layout
 i3-msg "[class=\"Code\"] focus"
 i3-msg "move container to workspace 2"
 i3-msg "[class=\"firefox\"] focus"
 i3-msg "move container to workspace 2"
 
-# adjust window sizes in workspace 2: vscode (60%) and firefox (40%)
+# Resize windows in workspace 2 (VSCode 60%, Firefox 40%)
 i3-msg "workspace 2; layout splith"
 i3-msg "focus left"
 i3-msg "resize set 60 ppt 100 ppt"
 i3-msg "focus right"
 i3-msg "resize set 40 ppt 100 ppt"
 
-# launch notion in workspace 3
+# Workspace 3 - Notion
 i3-msg "workspace 3; exec firefox --new-window https://www.notion.so/"
+sleep 2
 
-# launch spotify in workspace 4
+# Workspace 4 - Spotify
 i3-msg "workspace 4; exec spotify"
+sleep 2
 
-# launch telegram in workspace 5
+# Workspace 5 - Telegram
 i3-msg "workspace 5; exec telegram-desktop"
+sleep 2
 
-# return to coding workspace(workspace 2) after setup
+# Return to Workspace 2 (Coding workspace)
 i3-msg "workspace 2"
 
 echo "Workspace setup complete."
